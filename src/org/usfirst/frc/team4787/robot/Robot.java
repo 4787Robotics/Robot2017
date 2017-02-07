@@ -29,7 +29,10 @@ import java.util.Random;
  * this system. Use IterativeRobot or Command-Based instead if you're new.
  */
 public class Robot extends SampleRobot {
-	final double DEADZONEX = 0.07, DEADZONEY = 0.07;
+	RobotDrive myDrive;
+	
+	
+	//final double DEADZONEX = 0.07, DEADZONEY = 0.07;
    // final int MECH_DOOR_OPEN = 5, MECH_DOOR_CLOSE = 3;
     
 	
@@ -48,11 +51,10 @@ public class Robot extends SampleRobot {
     //int signY, signX;
   
     
-    public Robot() {
+    public void robotInit() {
+    	myDrive = new RobotDrive(1, 2, 3, 4);
     	stick = new Joystick(0);
-        
     }
-    
     
 
     /**
@@ -76,27 +78,30 @@ public class Robot extends SampleRobot {
      */
     public void operatorControl() {
         while (isOperatorControl() && isEnabled()) {
-
+        	//myDrive.arcadeDrive(stick);
+        	myDrive.arcadeDrive(-stick.getY(), -stick.getX());
+        	
+        	
+        	
+        	/*
         	y = stick.getY();
         	x = stick.getX();
         	//signY = (int)Math.signum(y);
         	//signX = (int)Math.signum(x);
+        	 */
         
         	//boolean openMechDoor = stick.getRawButton(MECH_DOOR_OPEN);
         	//boolean closeMechDoor = stick.getRawButton(MECH_DOOR_CLOSE);
 
         	// Determines if joystick is out of deadzone
+        	/*
     		if(x>DEADZONEX || x<-DEADZONEX){
     			expX = Math.pow(x, 3); // x^3 for nonlinear control
     			
     		}
     		if(y>DEADZONEY || y<-DEADZONEY){
     			expY = Math.pow(y, 3); // y^3 for nonlinear control
-    		
     		}
-        	
-//        	System.out.println(y);
-//        	System.out.println(x);
         	
         	expX = 0;
             expY = 0;
@@ -112,14 +117,15 @@ public class Robot extends SampleRobot {
             } else {
                 expY = 0;
             }
-    		
-    		
+    		*/
+
+    		/*
     	    // Motor power settings
     		fLeft.set(expX - expY);
     		bLeft.set(expX - expY);
     		fRight.set(expX + expY);
     		bRight.set(expX + expY);
-            
+            */
             
     		/*fLeft.set(expY);
     		bLeft.set(expY);
@@ -131,9 +137,8 @@ public class Robot extends SampleRobot {
     		//System.out.println(fRight);
     		//System.out.println(bLeft);
     		//System.out.println(bRight);
-    		
-    		System.out.println("Left motors set to: " + (expY));
-    		System.out.println("Right motors set to: " + (expX));
+    		//System.out.println("Left motors set to: " + (expY));
+    		//System.out.println("Right motors set to: " + (expX));
     		
     		/*
     		fLeft.set(x - y);
