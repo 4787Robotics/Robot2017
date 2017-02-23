@@ -1,9 +1,11 @@
+
 package org.usfirst.frc.team4787.robot;
 
 //2017
 
 import edu.wpi.first.wpilibj.SampleRobot;
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
@@ -33,138 +35,175 @@ import edu.wpi.first.wpilibj.Talon;
  */
 public class Robot extends SampleRobot {
 	final double DEADZONEX = 0.07, DEADZONEY = 0.07;
-   // final int MECH_DOOR_OPEN = 5, MECH_DOOR_CLOSE = 3, CLIMBING_MECH_UP = 4, CLIMBING_MECH_DOWN = 6;
+    final int MECH_DOOR_OPEN = 3, MECH_DOOR_CLOSE = 5, CLIMBING_MECH_UP = 4, CLIMBING_MECH_DOWN = 6;
     
 	
 
 	
-    Joystick stick;
-
+    Joystick stick = new Joystick(0);
     Talon bLeft = new Talon(1);
     Talon fLeft = new Talon(2);
     Talon bRight= new Talon(3);
     Talon fRight = new Talon(4);
-    RobotDrive arcadeDrive;
-    //Drive driveTrain;
-    //SendableChooser<Integer> autoChooser;
-    //TalonSRX gearMechDoor = new TalonSRX(5);
-    //TalonSRC climbingMech = new TalonSRX(6);
+    Servo rightGearDoorServo = new Servo(5);
+    Servo leftGearDoorServo = new Servo(6);
+    Spark climbingMech = new Spark(7);
+    RobotDrive arcadeDrive = null;
     
-    double y, x;
-    double expY, expX;
-    //int signY, signX;
+    
+    boolean initRobotDrive = true;
+    String autoMode = "M";
+    double y, x, expY, expX, autoPower, autoTime, leftDoorAngleStart, rightDoorAngleStart;
   
     
     public Robot() {
     	stick = new Joystick(0);
-        arcadeDrive = new RobotDrive(fLeft, bLeft, fRight, bRight);
-        //Drive driveTrain = new Drive(arcadeDrive);
-        Timer.delay(0.05);
-//        autoChooser = new SendableChooser();
-//        autoChooser.addDefault("Left Auto", 0);
-//        autoChooser.addObject("Middle Auto", 1);
-//        autoChooser.addDefault("Right Auto", 2);
-//        SmartDashboard.putData("Autonomous mode chooser", autoChooser);
+    	Timer.delay(0.05);
     }
     
-    
-
     /**
-     * AUTONOMOUS
+     * 
      */
-    public void autonomous() {
-    	double autoPower = 0.4;
-    	double autoTime = 2;
-    	bLeft.set(autoPower);
+    public void crossBaseLine() {
+    	autoPower = 0.4;
+		autoTime = 2;
+		bLeft.set(autoPower);
 		fLeft.set(autoPower);
 		bRight.set(-autoPower);
 		fRight.set(-autoPower);
 		Timer.delay(autoTime);
-		bLeft.set(0);
+    }
+    /**
+     * Method for robot to do a 180 degree turn in auto
+     */
+    public void turnAround() {
+    	autoPower = 0.4;
+		autoTime = 0.7;
+		bLeft.set(autoPower);
+		fLeft.set(autoPower);
+		bRight.set(-autoPower);
+		fRight.set(-autoPower);
+		Timer.delay(autoTime);
+    }
+    
+    /**
+     * Method for robot to turn left in auto
+     */
+    public void turnLeft() {
+    	autoPower = 0.4;
+		autoTime = 0.35;
+		bLeft.set(autoPower);
+		fLeft.set(autoPower);
+		bRight.set(autoPower);
+		fRight.set(autoPower);
+		Timer.delay(autoTime);
+    }
+    
+    /**
+     * method for robot to turn right in auto
+     */
+    public void turnRight() {
+    	autoPower = 0.4;
+		autoTime = 0.35;
+		bLeft.set(-autoPower);
+		fLeft.set(-autoPower);
+		bRight.set(-autoPower);
+		fRight.set(-autoPower);
+		Timer.delay(autoTime);
+    }
+    
+    /**
+     * Method to stop motors in general
+     */
+    public void stopMotors() {
+    	bLeft.set(0);
 		fLeft.set(0);
 		bRight.set(0);
 		fRight.set(0);
-    	//Integer autoMode = Integer.parseInt(autoChooser.getSelected().toString());
-    	//driveTrain.setMode("Autonomous");
-//    	String autoMode = "L";
-//    	double autoPower = 0.4;
-//    	double curve = 0.0;    	
-//    	switch(autoMode) {
-//    	case "L":
-//    		arcadeDrive.arcadeDrive(0.1, 0);
-//    		Timer.delay(4); // wait for a motor update time
-//    		break;
-//    	case "M":
-//    		//driveTrain.drive(autoPower, curve);
-//    		Timer.delay(4);		// wait for a motor update time
-//    		break;
-//    	case "R":
-//    		//driveTrain.drive(autoPower, curve);
-//    		Timer.delay(4);		// wait for a motor update time
-//    	default:
-//    		Timer.delay(0.05);		// wait for a motor update time
-//    		break;
-//    	}
+    }
+    
+    
+    /**
+     * AUTONOMOUS
+     */
+    public void autonomous() {
+    	switch(autoMode) {
+    		case "L":
+    			this.crossBaseLine();
+    			this.stopMotors();
+    			break;
+    		case "M":
+    			autoPower = 0.6;
+    			autoTime = 1.33;
+    			bLeft.set(autoPower);
+    			fLeft.set(autoPower);
+    			bRight.set(-autoPower);
+    			fRight.set(-autoPower);
+    			Timer.delay(autoTime);
+    			bLeft.set(autoPower);
+    			fLeft.set(autoPower);
+    			bRight.set(autoPower);
+    			fRight.set(autoPower);
+    			autoTime = 0.467;
+    			Timer.delay(autoTime/2);
+    			bLeft.set(0);
+    			fLeft.set(0);
+    			bRight.set(0);
+    			fRight.set(0);
+    			break;
+    		case "R":
+    			this.crossBaseLine();
+    			this.stopMotors();
+    			break;
+    		default:
+    			this.stopMotors();
+    			break;
+    	}		
     }
 
     /**
      * TELEOPERATED MODE. Runs the motors with arcade steering.
      */
     public void operatorControl() {
-        while (isOperatorControl() && isEnabled()) {
-        	arcadeDrive.arcadeDrive(-stick.getY(), -stick.getX());
-        	
-        	//testing servos
-        	Servo exampleServo = new Servo(1);
-        	
-        	exampleServo.set(.5);;
-        	exampleServo.setAngle(75);
-    		
-        	/*
-        	x = stick.getX();
-        	y = stick.getY();
-        	expX = 0;
-        	expY = 0;
-        	expX = Math.abs(x) > DEADZONEX ? x * Math.abs(x) : 0;
-        	expY = Math.abs(y) > DEADZONEY ? y * Math.abs(y) : 0;
-        	expX = Math.abs(x) > DEADZONEX ? Math.pow(x, 3) : 0;
-        	expY = Math.abs(y) > DEADZONEY ? Math.pow(y, 3) : 0;
-        	bLeft.set(expX - expY);
-    		fLeft.set(expX - expY);
-    		bRight.set(expX + expY);
-    		fRight.set(expX + expY);
-    		*/
-        	
-        	
-        	/**
-        	 * MECHANISMS
-        	 */
-        	/*
-        	boolean openMechDoor = stick.getRawButton(MECH_DOOR_OPEN);
+    	if(initRobotDrive || arcadeDrive.equals(null)) {
+        	arcadeDrive = new RobotDrive(fLeft, bLeft, fRight, bRight);
+        	initRobotDrive = false;
+        }
+    	while (isOperatorControl() && isEnabled()) {
+    		arcadeDrive.arcadeDrive(-stick.getY(), -stick.getX());
+    		boolean openMechDoor = stick.getRawButton(MECH_DOOR_OPEN);
         	boolean closeMechDoor = stick.getRawButton(MECH_DOOR_CLOSE);
         	boolean climbUpRope = stick.getRawButton(CLIMBING_MECH_UP);
         	boolean climbDownRope = stick.getRawButton(CLIMBING_MECH_DOWN);
-        	 */
-        	
-        	//gears mech
-    		/*if (openMechDoor)
-    			gearMechDoor.set(0.2); //don't know what to set this to
-    		} 
-    		if (closeMechDoor) {
-    			gearMechDoor.set(-0.2); //don't know what to set this to
-    		} */
-        	
-        	
-        	//climbing mech
-        	/*if (climbUpRope)
+        	if (climbUpRope) {
 				climbingMech.set(0.2); //don't know what to set this to
 			} 
 			if (climbDownRope) {
 				climbingMech.set(-0.2); //don't know what to set this to
-			} */
+			}
+        	if (openMechDoor) {
+        		leftGearDoorServo.setAngle(leftGearDoorServo.getAngle() + 90); //might have to reverse this with the one below
+        		rightGearDoorServo.setAngle(rightGearDoorServo.getAngle() - 90);
+    		} 
+    		if (closeMechDoor) {
+    			leftGearDoorServo.setAngle(leftGearDoorServo.getAngle() - 90); //might have to reverse this with the one above
+        		rightGearDoorServo.setAngle(rightGearDoorServo.getAngle() + 90);
+    		}
         	
-        	
-    		
+        	// Old Driving Code
+//        	x = stick.getX();
+//        	y = stick.getY();
+//        	expX = 0;
+//        	expY = 0;
+//        	expX = Math.abs(x) > DEADZONEX ? x * Math.abs(x) : 0;
+//        	expY = Math.abs(y) > DEADZONEY ? y * Math.abs(y) : 0;
+//        	expX = Math.abs(x) > DEADZONEX ? Math.pow(x, 3) : 0;
+//        	expY = Math.abs(y) > DEADZONEY ? Math.pow(y, 3) : 0;
+//        	bLeft.set(expX - expY);
+//    		fLeft.set(expX - expY);
+//    		bRight.set(expX + expY);
+//    		fRight.set(expX + expY);
+    				
     	    Timer.delay(0.005);		// wait for a motor update time
         }
     }
@@ -179,12 +218,10 @@ public class Robot extends SampleRobot {
     
     public void disabled()
     {
-    	fLeft.set(0);
-    	fRight.set(0);
-    	bLeft.set(0);
-    	bRight.set(0);
-    	//mechDoor.set(0);
-    	//climbingMech.set(0);
+    	this.stopMotors();
+    	rightGearDoorServo.setDisabled();
+    	leftGearDoorServo.setDisabled();
+    	climbingMech.set(0);
     	System.out.println("I prefer differently abled you ableist");
     }
     
